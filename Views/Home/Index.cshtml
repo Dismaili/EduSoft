@@ -1,0 +1,99 @@
+﻿@model WebApplicationIntern2.Models.ExchangeRateResponse
+@{
+    ViewData["Title"] = "Exchange Rates";
+}
+
+<div class="container mt-4">
+    <h1 class="text-center mb-4">North Macedonia Exchange Rates</h1>
+    <p class="text-center text-muted mb-4">Data from National Bank of North Macedonia (NBRM)</p>
+
+    <!-- Simple Search Form -->
+    <div class="row mb-4">
+        <div class="col-md-8 offset-md-2">
+            <form method="get" class="row g-3">
+                <div class="col-md-5">
+                    <input type="date" class="form-control" name="selectedDate" 
+                           value="@ViewBag.SelectedDate" max="@DateTime.Now.ToString("yyyy-MM-dd")" 
+                           placeholder="Select Date" />
+                </div>
+                <div class="col-md-5">
+                    <input type="text" class="form-control" name="searchCurrency" 
+                           value="@ViewBag.SearchCurrency" placeholder="Search currency (USD, EUR...)" />
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Status Message -->
+    @if (!string.IsNullOrEmpty(ViewBag.Message))
+    {
+        <div class="alert @(Model?.Success == true ? "alert-success" : "alert-danger") text-center">
+            @ViewBag.Message
+        </div>
+    }
+
+    <!-- Exchange Rates Table -->
+    @if (Model?.Success == true && Model.ExchangeRates.Any())
+    {
+        <div class="card">
+            <div class="card-header">
+                <h5>Exchange Rates for @Model.Date.ToString("MMMM dd, yyyy")</h5>
+                <small class="text-muted">@Model.ExchangeRates.Count currencies available</small>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th>Currency</th>
+                            <th>Country</th>
+                            <th>Units</th>
+                            <th>Rate (MKD)</th>
+                            <th>Trend</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var rate in Model.ExchangeRates)
+                        {
+                            <tr>
+                                <td><strong>@rate.Code</strong></td>
+                                <td>@rate.Country</td>
+                                <td>@rate.Nominal</td>
+                                <td class="text-end"><strong>@rate.Rate.ToString("N4")</strong></td>
+                                <td class="text-center">@rate.TrendIcon</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else if (Model?.Success == false)
+    {
+        <div class="alert alert-warning text-center">
+            <h4>No Data Available</h4>
+            <p>We couldn't retrieve exchange rates from NBRM.</p>
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <small class="text-muted">Details: @Model.ErrorMessage</small>
+            }
+        </div>
+    }
+    else if (Model?.ExchangeRates.Any() == false)
+    {
+        <div class="alert alert-info text-center">
+            <h4>No Results Found</h4>
+            <p>No exchange rates found for your search.</p>
+            <a href="@Url.Action("Index")" class="btn btn-primary">Show All</a>
+        </div>
+    }
+
+    <!-- Footer -->
+    <div class="text-center mt-4">
+        <small class="text-muted">
+            Source: <a href="https://www.nbrm.mk" target="_blank">National Bank of North Macedonia</a>
+        </small>
+    </div>
+</div>
