@@ -62,6 +62,36 @@ namespace WebApplicationIntern2.Services
         }
 
         /// <summary>
+        /// Get exchange rates for specific date returning ExchangeRateResponse
+        /// </summary>
+        public async Task<ExchangeRateResponse> GetExchangeRatesAsync(DateTime targetDate)
+        {
+            try
+            {
+                var dateString = targetDate.ToString("dd.MM.yyyy");
+                var rates = await GetExchangeRatesForDateAsync(dateString);
+                
+                return new ExchangeRateResponse
+                {
+                    ExchangeRates = rates,
+                    Date = targetDate,
+                    Success = true,
+                    ErrorMessage = string.Empty
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ExchangeRateResponse
+                {
+                    ExchangeRates = new List<ExchangeRateRow>(),
+                    Date = targetDate,
+                    Success = false,
+                    ErrorMessage = ex.Message
+                };
+            }
+        }
+
+        /// <summary>
         /// Get exchange rates for specific date using Connected Service
         /// </summary>
         public async Task<List<ExchangeRateRow>> GetExchangeRatesForDateAsync(string date)

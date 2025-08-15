@@ -3,6 +3,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient(); // <-- This enables IHttpClientFactory injection
+builder.Services.AddScoped<WebApplicationIntern2.Services.NBRMServiceWrapper>();
 
 var app = builder.Build();
 
